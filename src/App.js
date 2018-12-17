@@ -6,10 +6,10 @@ class App extends Component {
       data: null 
   }; 
   componentDidMount() { 
-      this.getData("./data/sankey.json"); 
+      this.getData("./data/energy.json"); 
   } 
   getData = uri => { 
-      fetch("./data/sankey.json", { 
+      fetch(uri, { 
       headers: { 
       "Content-Type": "application/json", 
       "Accept": "application/json" 
@@ -31,12 +31,12 @@ class App extends Component {
     return (
           <div>
           <SandkeyGraph
-            height={300}
-            width={700}
+            height={500}
+            width={1000}
             id="d3-sankey" 
             sankeyData = {this.state.data}
-            nodePadding = {40} 
-            nodeWidth = {36}
+            nodePadding = {10} 
+            nodeWidth = {15}
             colorCategory = {'20'}
           />
         </div>

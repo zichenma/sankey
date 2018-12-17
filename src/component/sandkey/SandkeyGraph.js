@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import sankeyModule from "./sankey"
 import styles from './sankey.css';
 
+
 class SankeyGraph extends Component {
   displayName: 'SankeyGraph';
   
@@ -33,9 +34,9 @@ class SankeyGraph extends Component {
 
  
   setContext() {
-    let units = "Widgets";
+    let units = " TWh";
     const { height, width, id, nodeWidth, nodePadding, colorCategory } = this.props;
-    const margin = {top: 100, right: 100, bottom: 100, left: 100};
+    const margin = {top: 1, right: 1, bottom: 6, left: 1};
     const colorCategories = {
         '10'  :  d3.schemeCategory10, 
         '20'  :  d3.schemeCategory20,
@@ -50,7 +51,7 @@ class SankeyGraph extends Component {
     }
    
     let formatNumber = d3.format(",.0f"),    
-    format = function(d) { return formatNumber(d) + " " + units; },
+    format = function(d) { return formatNumber(d) + units; },
     color = d3.scaleOrdinal(colorOptions);
 
 
@@ -68,6 +69,8 @@ class SankeyGraph extends Component {
                   .size([width, height]);
     
     let path = sankey.link();
+
+    let freqCounter = 1;
 
     sankey
       .nodes(graph.nodes)
@@ -135,6 +138,59 @@ class SankeyGraph extends Component {
           sankey.relayout();
           link.attr("d", path);
         }
+
+      // particle part: 
+      var linkExtent = d3.extent(graph.links, function (d) {return d.value});
+      var frequencyScale = d3.scaleLinear().domain(linkExtent).range([1,100]);
+      var particleSize = d3.scaleLinear().domain(linkExtent).range([1,5]);
+
+
+      graph.links.forEach(function (link) {
+        link.freq = frequencyScale(link.value);
+        link.particleSize = particleSize(link.value);
+        link.particleColor = d3.scaleLinear().domain([1,1000]).range([link.source.color, link.target.color]);
+      })
+
+      var t = d3.timer(tick, 1000);
+      var particles = [];
+
+      function tick(elapsed, time) {
+
+          particles = particles.filter(function (d) {return d.time > (elapsed - 1000)});
+
+          if (freqCounter > 100) {
+            freqCounter = 1;
+          }
+
+          d3.selectAll("path.link")
+          .each(
+            function (d) {
+              if (d.freq >= freqCounter) {
+                var offset = (Math.random() - .5) * d.dy;
+                particles.push({link: d, time: elapsed, offset: offset, path: this})
+              }
+            });
+
+          particleEdgeCanvasPath(elapsed);
+          freqCounter++;
+
+      }
+
+      function particleEdgeCanvasPath(elapsed) {
+        var context = d3.select("canvas").node().getContext("2d")
+        context.clearRect(0,0,1000,1000);
+          context.fillStyle = "gray";
+          context.lineWidth = "1px";
+        for (var x in particles) {
+            var currentTime = elapsed - particles[x].time;
+            var currentPercent = currentTime / 1000 * particles[x].path.getTotalLength();
+            var currentPos = particles[x].path.getPointAtLength(currentPercent)
+            context.beginPath();
+          context.fillStyle = particles[x].link.particleColor(currentTime);
+            context.arc(currentPos.x,currentPos.y + particles[x].offset,particles[x].link.particleSize,0,2*Math.PI);
+            context.fill();
+        }
+      }
   }
 
   render() {
@@ -143,7 +199,9 @@ class SankeyGraph extends Component {
       return null;
     }
     return (
-      <div ref="sankey"></div>
+      <div ref="sankey">
+        <canvas width="1000" height="500" ></canvas>
+      </div>
     )
   }
 }
