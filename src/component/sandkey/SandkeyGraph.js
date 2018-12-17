@@ -200,7 +200,7 @@ class SankeyGraph extends Component {
     }
     return (
       <div ref="sankey">
-        <canvas width="1000" height="500" ></canvas>
+        <canvas width= { this.props.width } height={this.props.height} ></canvas>
       </div>
     )
   }
