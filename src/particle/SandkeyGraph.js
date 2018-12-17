@@ -7,13 +7,12 @@ class SankeyGraph extends Component {
   displayName: 'SankeyGraph';
   
   state = {
-    sankeyData : null
+    importedData : null
   }
 
   constructor(props) {
     super(props);
-    this.state.sankeyData = props.sankeyData || null;
-    console.log(props.sankeyData);// shows null
+    this.state.importedData = props.sankeyData || null;
   }
   
   PropTypes : {
@@ -23,29 +22,26 @@ class SankeyGraph extends Component {
     sankeyData : PropTypes.object,
   }
 
-  componentWillMount() {
-    //console.log(this.props.sankeyData);
-    //this.setState({ this.state.sankeyData});
-  }
-
+ 
   componentDidMount () {
-    console.log(this.state.sankeyData);
     this.setContext();
   }
 
-  componentDidUpdate() {
-    //this.setContext();
-  }
-
+ 
   setContext() {
     let units = "Widgets";
     const { height, width, id} = this.props;
     const margin = {top: 100, right: 100, bottom: 100, left: 100};
-    const graph = this.state.sankeyData;
-    // format variables
-    let formatNumber = d3.format(",.0f"),    // zero decimal places
+    let graph = this.state.importedData;
+
+    if (graph == null) {
+      return;
+    }
+    
+    let formatNumber = d3.format(",.0f"),    
     format = function(d) { return formatNumber(d) + " " + units; },
     color = d3.scaleOrdinal(d3.schemeCategory20);
+
     let svg = d3.select(this.refs.sankey).append('svg')
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -54,7 +50,6 @@ class SankeyGraph extends Component {
                 .attr("transform", 
                     "translate(" + margin.left + "," + margin.top + ")");
 
-    // Set the sankey diagram properties
     let sankey = sankeyModule(d3)
                   .nodeWidth(36)
                   .nodePadding(40)
@@ -131,8 +126,8 @@ class SankeyGraph extends Component {
   }
 
   render() {
-    const { sankeyData } = this.state;
-    if (!sankeyData) {
+    const { importedData } = this.state;
+    if (!importedData) {
       return null;
     }
     return (
