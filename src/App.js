@@ -33,8 +33,8 @@ class App extends Component {
           <SankeyGraph
             height={500}
             width={1000}
-            margin_top={100}
-            margin_right={100}
+            margin_top={40}
+            margin_right={40}
             margin_bottom={100}
             margin_left={100}
             id="d3-sankey" 
