@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import * as d3 from "d3";
 import sankeyModule from "./sankey"
 import styles from './sankey.css';
+// import SankeyParticle from '../particle/SankeyParticle';
 
 
 class SankeyGraph extends Component {
@@ -21,6 +22,10 @@ class SankeyGraph extends Component {
     colorCategory : PropTypes.string,
     height: PropTypes.number,
     width: PropTypes.number,
+    margin_left : PropTypes.number,
+    margin_right: PropTypes.number,
+    margin_top: PropTypes.number,
+    margin_bottom: PropTypes.number,
     nodeWidth : PropTypes.number,
     nodePadding : PropTypes.number,
     sankeyData : PropTypes.object,
@@ -32,11 +37,14 @@ class SankeyGraph extends Component {
     this.setContext();
   }
 
- 
   setContext() {
     let units = " TWh";
-    const { height, width, id, nodeWidth, nodePadding, colorCategory } = this.props;
-    const margin = {top: 1, right: 1, bottom: 6, left: 1};
+    const { height, width, margin_left, margin_right, 
+            margin_top, margin_bottom, id, nodeWidth, 
+            nodePadding, colorCategory } = this.props;
+
+    const margin = {top: margin_top, right: margin_right, bottom: margin_bottom, left: margin_left};
+
     const colorCategories = {
         '10'  :  d3.schemeCategory10, 
         '20'  :  d3.schemeCategory20,
@@ -53,7 +61,7 @@ class SankeyGraph extends Component {
     let formatNumber = d3.format(",.0f"),    
     format = function(d) { return formatNumber(d) + units; },
     color = d3.scaleOrdinal(colorOptions);
-
+    
 
     let svg = d3.select(this.refs.sankey).append('svg')
                 .attr("width", width + margin.left + margin.right)
@@ -62,6 +70,11 @@ class SankeyGraph extends Component {
                 .append('g')
                 .attr("transform", 
                     "translate(" + margin.left + "," + margin.top + ")");
+                    
+    document.querySelector('canvas').style.marginTop = this.props.margin_top + 'px';
+    document.querySelector('canvas').style.marginRight = this.props.margin_right + 'px';
+    document.querySelector('canvas').style.marginBottom = this.props.margin_bottom + 'px';
+    document.querySelector('canvas').style.marginLeft = this.props.margin_left + 'px';
 
     let sankey = sankeyModule(d3)
                   .nodeWidth(nodeWidth)
@@ -69,8 +82,6 @@ class SankeyGraph extends Component {
                   .size([width, height]);
     
     let path = sankey.link();
-
-    let freqCounter = 1;
 
     sankey
       .nodes(graph.nodes)
@@ -117,15 +128,15 @@ class SankeyGraph extends Component {
         return d.name + "\n" + format(d.value); });
 
         node.append("text")
-        .attr("x", -6)
-        .attr("y", function(d) { return d.dy / 2; })
-        .attr("dy", ".35em")
-        .attr("text-anchor", "end")
-        .attr("transform", null)
-        .text(function(d) { return d.name; })
-        .filter(function(d) { return d.x < width / 2; })
-        .attr("x", 6 + sankey.nodeWidth())
-        .attr("text-anchor", "start");
+          .attr("x", -6)
+          .attr("y", function(d) { return d.dy / 2; })
+          .attr("dy", ".35em")
+          .attr("text-anchor", "end")
+          .attr("transform", null)
+          .text(function(d) { return d.name; })
+          .filter(function(d) { return d.x < width / 2; })
+          .attr("x", 6 + sankey.nodeWidth())
+          .attr("text-anchor", "start");
         
         function dragmove(d) {
           d3.select(this)
@@ -138,12 +149,14 @@ class SankeyGraph extends Component {
           sankey.relayout();
           link.attr("d", path);
         }
-
+      
       // particle part: 
-      var linkExtent = d3.extent(graph.links, function (d) {return d.value});
-      var frequencyScale = d3.scaleLinear().domain(linkExtent).range([1,100]);
-      var particleSize = d3.scaleLinear().domain(linkExtent).range([1,5]);
-
+      let freqCounter = 1;
+      let linkExtent = d3.extent(graph.links, function (d) {return d.value});
+      let frequencyScale = d3.scaleLinear().domain(linkExtent).range([1,100]);
+      let particleSize = d3.scaleLinear().domain(linkExtent).range([1,5]);
+ 
+      
 
       graph.links.forEach(function (link) {
         link.freq = frequencyScale(link.value);
@@ -200,7 +213,10 @@ class SankeyGraph extends Component {
     }
     return (
       <div ref="sankey">
-        <canvas width="1000" height="500" ></canvas>
+        <canvas 
+        height={this.props.height} 
+        width={this.props.width}
+        ></canvas>
       </div>
     )
   }
