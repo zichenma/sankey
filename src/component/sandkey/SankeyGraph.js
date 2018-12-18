@@ -4,6 +4,7 @@ import sankeyModule from "./sankey"
 import styles from './sankey.css';
 // ideally to make particle part into another component,
 // but got some color issue, had to gave up
+// it works you uncomment and try it
 //import SankeyParticle from '../particle/SankeyParticle';
 
 class SankeyGraph extends Component {
