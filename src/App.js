@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import SandkeyGraph from './component/sandkey/SandkeyGraph';
+import SankeyGraph from './component/sandkey/SankeyGraph';
 
 class App extends Component { 
   state = { 
@@ -30,9 +30,13 @@ class App extends Component {
     }
     return (
           <div>
-          <SandkeyGraph
+          <SankeyGraph
             height={500}
             width={1000}
+            margin_top={100}
+            margin_right={100}
+            margin_bottom={100}
+            margin_left={100}
             id="d3-sankey" 
             sankeyData = {this.state.data}
             nodePadding = {10} 
