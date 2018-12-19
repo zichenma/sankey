@@ -41,7 +41,7 @@ class App extends Component {
             sankeyData = {this.state.data}
             nodePadding = {10} 
             nodeWidth = {15}
-            colorCategory = {'20'}
+            colorCategory = {20}
           />
         </div>
     );

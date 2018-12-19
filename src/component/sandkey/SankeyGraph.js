@@ -31,19 +31,59 @@ class SankeyGraph extends Component {
     nodeWidth : PropTypes.number,
     nodePadding : PropTypes.number,
     sankeyData : PropTypes.object,
-    
   }
 
   componentDidMount () {
     this.setContext();
   }
-
+  
   setCanvasDim (top, right, bottom, left) {
     document.querySelector('canvas').style.marginTop = `${top}px`;
     document.querySelector('canvas').style.marginRight = `${right}px`;
     document.querySelector('canvas').style.marginBottom = `${bottom}px` ;
     document.querySelector('canvas').style.marginLeft = `${left}px`;
   }
+
+  // testing in Jasmine sample code: 
+  // describe('SankeyGraph Canvas size testing', () => {
+  //   it('Should keep the same margin size as svg', () => {
+  //       setCanvasDim(10,10,10,10);
+  //       const canvas_marginTop = document.querySelector('canvas').style.marginTop;
+  //       const svg_marginTop =  document.querySelector('svg').style.marginTop;
+  //       expect(canvas_marginTop).toEqual(svg_marginTop);
+  //   })
+  // })
+
+  setColor (colorCategory) {
+     const colorCategories = {
+        '10'  :  d3.schemeCategory10, 
+        '20'  :  d3.schemeCategory20,
+        '20b' :  d3.schemeCategory20b,
+        '20c' :  d3.schemeCategory20c 
+    }
+    return  colorCategories[String(colorCategory)] || d3.schemeCategory20;
+  }
+  // testing in Jasmine sample code: 
+  // describe('SankeyGraph color testing', () => {
+  //   it ('Should return d3.schemeCategory10', () => {
+  //         let result = d3.schemeCategory10;
+  //         expect(setColor('10')).toEqual(result);
+  //   })
+  // })
+
+  validateData (obj) {
+    if ((!!obj) && (obj.constructor !== Object)) {
+      console.error('input data must be an object!');
+      return;
+    }
+  }
+   // testing in Jasmine sample code: 
+  //  describe('SankeyGraph data testing', () => {
+  //   it ('Should throw invalid data fromat error', () => {
+  //        let obj = [];
+  //        expect((!!obj) && (obj.constructor !== Object)).toEqual(true);
+  //   })
+  // })
 
   setContext() {
     let units = " TWh";
@@ -53,29 +93,21 @@ class SankeyGraph extends Component {
 
     const margin = {top: margin_top, right: margin_right, bottom: margin_bottom, left: margin_left};
 
-    const colorCategories = {
-        '10'  :  d3.schemeCategory10, 
-        '20'  :  d3.schemeCategory20,
-        '20b' :  d3.schemeCategory20b,
-        '20c' :  d3.schemeCategory20c 
-    }
-    const colorOptions = colorCategories[colorCategory];
     const graph = this.state.importedData;
+
+    this.validateData(graph);
 
     this.setCanvasDim(
       this.props.margin_top, this.props.margin_right, 
       this.props.margin_bottom, this.props.margin_left
     );
 
-    if (graph == null) {
-      return;
-    }
-   
     let formatNumber = d3.format(",.0f"),
 
     format = (d) => { return formatNumber(d) + units; },
     
-    color = d3.scaleOrdinal(colorOptions);
+    // default color: d3 category20
+    color = d3.scaleOrdinal(this.setColor(colorCategory) || d3.schemeCategory20);
     
     let svg = d3.select(this.refs.sankey).append('svg')
                 .attr("width", width + margin.left + margin.right)
@@ -159,10 +191,10 @@ class SankeyGraph extends Component {
           link.attr("d", path);
         }
       
-      // particle part: 
+     
       this.setParticle(graph);
   }
-
+  // particle part: 
   setParticle (graph) {
     let freqCounter = 1;
     let linkExtent = d3.extent(graph.links, function (d) {return d.value});

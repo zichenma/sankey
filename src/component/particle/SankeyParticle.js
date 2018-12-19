@@ -30,7 +30,6 @@ class SankeyParticle extends Component {
 
  
   setContext() {
-
     const { height, width, margin_left, margin_right, 
             margin_top, margin_bottom
        } = this.props;
