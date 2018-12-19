@@ -15,5 +15,5 @@ Properties:
 8. sankeyData (Object) : the data come from outside component
 9. nodePadding (Number) : the padding of node (each bar)
 10. nodeWidth (Number) : the width of node (each bar)
-11. colorCategory (String) : the d3 categorical colors (input value as: '10', '20', '20b', '20c')<br/>
+11. colorCategory (String, default: d3 category20) : the d3 categorical colors (input value as: '10', '20', '20b', '20c')<br/>
 Please refer to (not sopport google 10c) : http://bl.ocks.org/aaizemberg/78bd3dade9593896a59d
