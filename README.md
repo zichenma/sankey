@@ -6,7 +6,7 @@ Start the app:
 
 Properties:
 1. height (Number) : the height (px) of the component 
-2. height (Number) : the width (px) of the component
+2. width (Number) : the width (px) of the component
 3. margin_top (Number) : the margion top (px) of the component
 4. margin_right (Number) : the margion right (px) of the component
 5. margin_bottom (Number) : the margion bottom (px) of the component
